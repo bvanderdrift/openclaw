@@ -1,4 +1,20 @@
 services:
+  caddy:
+    image: caddy:2
+    environment:
+      OPENCLAW_DOMAIN: ${OPENCLAW_DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+    depends_on:
+      - openclaw-gateway
+
   openclaw-gateway:
     image: ${OPENCLAW_IMAGE:-openclaw:local}
     environment:
@@ -11,9 +27,9 @@ services:
     volumes:
       - ${OPENCLAW_CONFIG_DIR}:/home/node/.openclaw
       - ${OPENCLAW_WORKSPACE_DIR}:/home/node/.openclaw/workspace
-    ports:
-      - "${OPENCLAW_GATEWAY_PORT:-18789}:18789"
-      - "${OPENCLAW_BRIDGE_PORT:-18790}:18790"
+    expose:
+      - "18789"
+      - "18790"
     init: true
     restart: unless-stopped
     command:
@@ -47,3 +63,7 @@ services:
     entrypoint: ["node", "dist/index.js"]
     depends_on:
       - openclaw-gateway
+
+volumes:
+  caddy_data:
+  caddy_config:
