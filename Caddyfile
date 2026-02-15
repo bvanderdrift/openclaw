@@ -1,3 +1,7 @@
 {$OPENCLAW_DOMAIN} {
 	reverse_proxy openclaw-gateway:18789
 }
+
+dev.{$OPENCLAW_DOMAIN} {
+    reverse_proxy openclaw-gateway:8080
+}
